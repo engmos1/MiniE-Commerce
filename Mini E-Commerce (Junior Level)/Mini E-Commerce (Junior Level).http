@@ -1,0 +1,6 @@
+@Mini_E_Commerce__Junior_Level__HostAddress = http://localhost:5038
+
+GET {{Mini_E_Commerce__Junior_Level__HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

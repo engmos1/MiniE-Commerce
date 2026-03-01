@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Application/Application.csproj" />
+  <Project Path="Domain/Domain.csproj" />
+  <Project Path="Infrastructure (Data Access)/Infrastructure (Data Access).csproj" />
+  <Project Path="Mini E-Commerce (Junior Level)/Mini E-Commerce (Junior Level).csproj" />
+</Solution>

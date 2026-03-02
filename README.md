@@ -14,11 +14,9 @@ A full-stack e-commerce demo application built with **ASP.NET Core 8 Web API** (
 
 - [Overview](#-overview)
 - [Features](#-features)
-- [Architecture](#-architecture)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
 - [API Endpoints](#-api-endpoints)
-- [Database Schema](#-database-schema)
 - [Getting Started](#-getting-started)
 - [License](#-license)
 

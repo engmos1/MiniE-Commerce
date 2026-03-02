@@ -54,27 +54,6 @@ A full-stack e-commerce demo application built with **ASP.NET Core 8 Web API** (
 
 ---
 
-## 🏗 Architecture
-
-The backend follows **Clean Architecture** with four layers:
-┌──────────────────────────────────────────────────┐
-│                  Presentation                    │ 
-│          (ASP.NET Core Web API Controllers)      │ 
-├──────────────────────────────────────────────────┤ 
-│                  Application                     │ 
-│       (Services, DTOs, Interfaces)               │ 
-├──────────────────────────────────────────────────┤ 
-│                    Domain                        │ 
-│            (Entities, Base Classes)              │ 
-├──────────────────────────────────────────────────┤ 
-│              Infrastructure                      │ 
-│    (EF Core DbContext, Repositories, Migrations) │ 
-└──────────────────────────────────────────────────┘
-
-**Dependency Flow:** Presentation → Application → Domain ← Infrastructure
-
----
-
 ## 🛠 Tech Stack
 
 | Layer          | Technology                          |
@@ -147,24 +126,7 @@ The backend follows **Clean Architecture** with four layers:
 }
 
 
----
 
-## 🗄 Database Schema
-┌─────────────┐       ┌──────────────┐       ┌─────────────┐ 
-│   Products  │       │  OrderItems  │       │   Orders    │ 
-├─────────────┤       ├──────────────┤       ├─────────────┤ 
-│ Id (PK)     │◄──────│ ProductId(FK)│       │ Id (PK)     │ 
-│ Name        │       │ OrderId (FK) │──────►│ CustomerName│ 
-│ Price       │       │ Quantity     │       │CustomerEmail│ 
-│ AvailableQty│       │ UnitPrice    │       │ CreatedAt   │ 
-└─────────────┘       │ LineTotal    │       │ TotalItems  │ 
-                      └──────────────┘       │ SubTotal    │ 
-                                             │ Discount %  │ 
-                                             │ DiscountAmt │ 
-                                             │ FinalTotal  │ 
-                                             └─────────────┘
-
----
 
 ## 🚀 Getting Started
 

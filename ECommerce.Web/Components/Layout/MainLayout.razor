@@ -1,0 +1,23 @@
+@inherits LayoutComponentBase
+
+<div class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-cart3 me-2"></i>Mini E-Commerce
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/products"><i class="bi bi-box-seam me-1"></i>Products</a>
+            <a class="nav-link" href="/products/create"><i class="bi bi-plus-circle me-1"></i>Add Product</a>
+            <a class="nav-link" href="/orders/create"><i class="bi bi-bag-plus me-1"></i>New Order</a>
+            <a class="nav-link" href="/orders/lookup"><i class="bi bi-search me-1"></i>Find Order</a>
+        </div>
+    </nav>
+
+    <main class="container mt-4 flex-grow-1">
+        @Body
+    </main>
+
+    <footer class="bg-light text-center py-3 mt-4">
+        <small class="text-muted">Mini E-Commerce &copy; 2025</small>
+    </footer>
+</div>

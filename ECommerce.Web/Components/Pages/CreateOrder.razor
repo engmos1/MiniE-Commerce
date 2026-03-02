@@ -1,0 +1,151 @@
+@page "/orders/create"
+@rendermode InteractiveServer
+@inject ProductApiClient ProductApi
+@inject OrderApiClient OrderApi
+
+<h3 class="mb-4"><i class="bi bi-bag-plus me-2"></i>Create Order</h3>
+
+@if (_orderResult is not null)
+{
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle me-2"></i>
+        Order created successfully!
+        <a href="/orders/@_orderResult.Id" class="btn btn-sm btn-outline-success ms-2">View Order Details</a>
+    </div>
+}
+
+@if (_error is not null)
+{
+    <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>@_error</div>
+}
+
+@if (_loadingProducts)
+{
+    <div class="d-flex align-items-center">
+        <div class="spinner-border text-primary me-2" role="status"></div>
+        <span>Loading products...</span>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">Customer Information</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Customer Name</label>
+                    <input class="form-control" @bind="_customerName" placeholder="Full name" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Customer Email</label>
+                    <input type="email" class="form-control" @bind="_customerEmail" placeholder="email@example.com" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <span>Order Items</span>
+            <button class="btn btn-sm btn-light" @onclick="AddItem">
+                <i class="bi bi-plus me-1"></i>Add Item
+            </button>
+        </div>
+        <div class="card-body">
+            @if (_items.Count == 0)
+            {
+                <p class="text-muted">No items added yet.</p>
+            }
+            else
+            {
+                @for (int i = 0; i < _items.Count; i++)
+                {
+                    var index = i;
+                    <div class="row align-items-end mb-3 border-bottom pb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Product</label>
+                            <select class="form-select" @bind="_items[index].ProductId">
+                                <option value="@Guid.Empty">-- Select Product --</option>
+                                @if (_products is not null)
+                                {
+                                    @foreach (var p in _products)
+                                    {
+                                        <option value="@p.Id">@p.Name — @p.Price.ToString("C") (Stock: @p.AvailableQuantity)</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control" min="1" @bind="_items[index].Quantity" />
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <button class="btn btn-outline-danger btn-sm" @onclick="() => RemoveItem(index)">
+                                <i class="bi bi-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <button class="btn btn-success btn-lg" @onclick="HandleSubmit" disabled="@_submitting">
+        @if (_submitting)
+        {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+        }
+        <i class="bi bi-check-lg me-1"></i>Place Order
+    </button>
+}
+
+@code {
+    private List<ProductDto>? _products;
+    private bool _loadingProducts = true;
+    private string _customerName = "";
+    private string _customerEmail = "";
+    private List<CreateOrderItemDto> _items = new();
+    private OrderDto? _orderResult;
+    private string? _error;
+    private bool _submitting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProductApi.GetProductsAsync(1, 100);
+        _products = result?.Items;
+        _loadingProducts = false;
+    }
+
+    private void AddItem() => _items.Add(new CreateOrderItemDto { Quantity = 1 });
+
+    private void RemoveItem(int index) => _items.RemoveAt(index);
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            _submitting = true;
+            _error = null;
+
+            var dto = new CreateOrderDto
+            {
+                CustomerName = _customerName,
+                CustomerEmail = _customerEmail,
+                Items = _items
+            };
+
+            _orderResult = await OrderApi.CreateOrderAsync(dto);
+            _customerName = "";
+            _customerEmail = "";
+            _items = new();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+}

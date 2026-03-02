@@ -1,0 +1,80 @@
+@page "/products/create"
+@rendermode InteractiveServer
+@inject ProductApiClient ProductApi
+
+<h3 class="mb-4"><i class="bi bi-plus-circle me-2"></i>Create Product</h3>
+
+@if (_success is not null)
+{
+    <div class="alert alert-success d-flex align-items-center">
+        <i class="bi bi-check-circle me-2"></i>
+        Product "<strong>@_success.Name</strong>" created successfully!
+        <a href="/products" class="ms-auto btn btn-sm btn-outline-success">View Products</a>
+    </div>
+}
+
+@if (_error is not null)
+{
+    <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>@_error</div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <EditForm Model="_model" OnValidSubmit="HandleSubmit" FormName="CreateProduct">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-3">
+                <label class="form-label">Product Name</label>
+                <InputText class="form-control" @bind-Value="_model.Name" placeholder="Enter product name" />
+                <ValidationMessage For="() => _model.Name" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Price</label>
+                <InputNumber class="form-control" @bind-Value="_model.Price" placeholder="0.00" />
+                <ValidationMessage For="() => _model.Price" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Available Quantity</label>
+                <InputNumber class="form-control" @bind-Value="_model.AvailableQuantity" placeholder="0" />
+                <ValidationMessage For="() => _model.AvailableQuantity" class="text-danger" />
+            </div>
+
+            <button type="submit" class="btn btn-primary" disabled="@_submitting">
+                @if (_submitting)
+                {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                }
+                Create Product
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private CreateProductDto _model = new();
+    private ProductDto? _success;
+    private string? _error;
+    private bool _submitting;
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            _submitting = true;
+            _error = null;
+            _success = await ProductApi.CreateProductAsync(_model);
+            _model = new();
+        }
+        catch (Exception ex)
+        {
+            _error = $"Failed to create product: {ex.Message}";
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+}

@@ -1,0 +1,109 @@
+@page "/orders/{Id:guid}"
+@rendermode InteractiveServer
+@inject OrderApiClient OrderApi
+
+<h3 class="mb-4"><i class="bi bi-receipt me-2"></i>Order Details</h3>
+
+@if (_loading)
+{
+    <div class="d-flex align-items-center">
+        <div class="spinner-border text-primary me-2" role="status"></div>
+        <span>Loading order...</span>
+    </div>
+}
+else if (_error is not null)
+{
+    <div class="alert alert-danger">@_error</div>
+}
+else if (_order is not null)
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">Customer</div>
+        <div class="card-body">
+            <p><strong>Name:</strong> @_order.CustomerName</p>
+            <p><strong>Email:</strong> @_order.CustomerEmail</p>
+            <p><strong>Date:</strong> @_order.CreatedAt.ToString("g")</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">Items</div>
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Line Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in _order.Items)
+                    {
+                        <tr>
+                            <td>@item.ProductName</td>
+                            <td class="text-end">@item.UnitPrice.ToString("C")</td>
+                            <td class="text-end">@item.Quantity</td>
+                            <td class="text-end">@item.LineTotal.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">Summary</div>
+        <div class="card-body">
+            <div class="row mb-2">
+                <div class="col-6"><strong>Total Items:</strong></div>
+                <div class="col-6 text-end">@_order.TotalItems</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>Subtotal:</strong></div>
+                <div class="col-6 text-end">@_order.SubTotal.ToString("C")</div>
+            </div>
+
+            @if (_order.DiscountPercentage > 0)
+            {
+                <div class="row mb-2 text-success">
+                    <div class="col-6"><strong>Discount (@_order.DiscountPercentage%):</strong></div>
+                    <div class="col-6 text-end">-@_order.DiscountAmount.ToString("C")</div>
+                </div>
+            }
+
+            <hr />
+            <div class="row">
+                <div class="col-6"><h5>Final Total:</h5></div>
+                <div class="col-6 text-end"><h5 class="text-primary">@_order.FinalTotal.ToString("C")</h5></div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private OrderDto? _order;
+    private bool _loading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _order = await OrderApi.GetOrderAsync(Id);
+            if (_order is null)
+                _error = "Order not found.";
+        }
+        catch (Exception ex)
+        {
+            _error = $"Failed to load order: {ex.Message}";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}
